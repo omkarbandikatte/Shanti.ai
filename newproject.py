@@ -2,7 +2,6 @@ import streamlit as st
 import google.generativeai as genai
 from langchain_google_genai import ChatGoogleGenerativeAI  # Ensure correct import
 from langchain.prompts import PromptTemplate
-from langchain.chains import RunnableSequence
 from textblob import TextBlob
 import os
 from dotenv import load_dotenv
