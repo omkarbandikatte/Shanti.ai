@@ -2,13 +2,20 @@ import streamlit as st
 import google.generativeai as genai
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.prompts import PromptTemplate
-from langchain.chains import RunnableSequence  # Import RunnableSequence instead of LLMChain
+from langchain.chains import LLMChain  # Using LLMChain instead of RunnableSequence
 from textblob import TextBlob
 import os
 from dotenv import load_dotenv
 
+# Load environment variables
 load_dotenv()
-genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
+
+# Ensure API key is being correctly loaded
+api_key = os.getenv("GOOGLE_API_KEY")
+if not api_key:
+    st.error("API key is missing. Please check your .env file.")
+
+genai.configure(api_key=api_key)
 
 # Optimized prompt template
 prompt_template = """
@@ -20,13 +27,14 @@ User: {user_input}
 Your Response:
 """
 
-# Optimized model parameters
+# Create the model instance
 model = ChatGoogleGenerativeAI(model="gemini-pro", temperature=0.3, stream=True)
 
+# Define the prompt template
 prompt = PromptTemplate(template=prompt_template, input_variables=["user_input"])
 
-# Use RunnableSequence instead of LLMChain
-chain = prompt | model  # Using `|` to chain the prompt and model into a RunnableSequence
+# Create the LLMChain
+chain = LLMChain(prompt=prompt, llm=model)
 
 
 def analyze_sentiment(user_input):
@@ -37,13 +45,15 @@ def analyze_sentiment(user_input):
 def provide_supportive_response(user_input):
     """Generates AI response and adds supportive messaging based on sentiment."""
     sentiment = analyze_sentiment(user_input)
-    
+
+    # Display sentiment-based messages
     if sentiment < -0.3:
         st.write("💙 I sense you're feeling down. It's okay to feel this way, and I'm here to support you.")
     elif sentiment > 0.3:
         st.write("😊 It's great to hear you're feeling positive! Keep it up!")
 
-    return chain.invoke({"user_input": user_input})  # Use invoke instead of run()
+    # Generate response from the chain
+    return chain.run({"user_input": user_input})
 
 
 def main():
