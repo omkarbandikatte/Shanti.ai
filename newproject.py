@@ -2,7 +2,7 @@ import streamlit as st
 import google.generativeai as genai
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.prompts import PromptTemplate
-from langchain.chains import LLMChain
+from langchain.chains import RunnableSequence  # Import RunnableSequence instead of LLMChain
 from textblob import TextBlob
 import os
 from dotenv import load_dotenv
@@ -24,7 +24,9 @@ Your Response:
 model = ChatGoogleGenerativeAI(model="gemini-pro", temperature=0.3, stream=True)
 
 prompt = PromptTemplate(template=prompt_template, input_variables=["user_input"])
-chain = LLMChain(llm=model, prompt=prompt)
+
+# Use RunnableSequence instead of LLMChain
+chain = prompt | model  # Using `|` to chain the prompt and model into a RunnableSequence
 
 
 def analyze_sentiment(user_input):
@@ -41,7 +43,7 @@ def provide_supportive_response(user_input):
     elif sentiment > 0.3:
         st.write("😊 It's great to hear you're feeling positive! Keep it up!")
 
-    return chain.run(user_input=user_input)
+    return chain.invoke({"user_input": user_input})  # Use invoke instead of run()
 
 
 def main():
