@@ -1,8 +1,8 @@
 import streamlit as st
 import google.generativeai as genai
-from langchain_google_genai import ChatGoogleGenerativeAI  # This import should work with the updated version
+from langchain_google_genai import ChatGoogleGenerativeAI  # Ensure correct import
 from langchain.prompts import PromptTemplate
-from langchain.chains import RunnableSequence  # Import RunnableSequence instead of LLMChain
+from langchain.chains import RunnableSequence
 from textblob import TextBlob
 import os
 from dotenv import load_dotenv
@@ -25,14 +25,12 @@ model = ChatGoogleGenerativeAI(model="gemini-pro", temperature=0.3, stream=True)
 
 prompt = PromptTemplate(template=prompt_template, input_variables=["user_input"])
 
-# Use RunnableSequence instead of LLMChain
-chain = prompt | model  # Using `|` to chain the prompt and model into a RunnableSequence
-
+# Using `RunnableSequence` instead of `LLMChain`
+chain = prompt | model  # Chain the prompt and model
 
 def analyze_sentiment(user_input):
     """Performs sentiment analysis using TextBlob."""
     return TextBlob(user_input).sentiment.polarity
-
 
 def provide_supportive_response(user_input):
     """Generates AI response and adds supportive messaging based on sentiment."""
@@ -44,7 +42,6 @@ def provide_supportive_response(user_input):
         st.write("😊 It's great to hear you're feeling positive! Keep it up!")
 
     return chain.invoke({"user_input": user_input})  # Use invoke instead of run()
-
 
 def main():
     st.set_page_config(page_title="Shanti.ai", page_icon="🧘")
@@ -70,7 +67,6 @@ def main():
         - 💡 [Mental Health Tips](https://www.nami.org)
         - 🎵 [Guided Meditation](https://www.calm.com)
     """)
-
 
 if __name__ == "__main__":
     main()
